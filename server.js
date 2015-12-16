@@ -24,7 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Default route
 app.get("/", function(req, res) {
-  res.send("HELLO WORLD");
+  res.sendFile(path.join(__dirname + "/client/index.html"));
 });
 
 // New short url route
