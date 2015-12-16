@@ -1,3 +1,3 @@
-# brainboost
-An app to vote and shape ideas
+# shurli
+An api to shorten URLs
 by Herman Fassett
