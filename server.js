@@ -28,29 +28,21 @@ app.get("/", function(req, res) {
 
 // New short url route
 app.get("/new/:url", function(req, res) {
-  var input = req.params.url;
+  var input = encodeURIComponent(req.params.url);
+  console.log(input);
   Url.findOne({original_url: input}, function(err, result) {
     if (!result) {
       Current.findOne({}, function(err, result) {
         if (err) throw err;
-        if (!result) {
-          var curr = new Current({
-            current: "0"
-          });
-          curr.save();
-          res.send("Saved");
-        }
-        else {
-          console.log(result);
-          var short = result.current;
-          var url = new Url({
-            original_url: input,
-            short_id: short
-          });
-          url.save();
-          var shorturl = process.env.APP_URL + short;
-          res.json({original_url:input, short_url: short})
-        }
+        console.log(result);
+        var short = result.current;
+        var url = new Url({
+          original_url: input,
+          short_id: short
+        });
+        url.save();
+        var shorturl = process.env.APP_URL + short;
+        res.json({original_url:input, short_url: short})
       });
     }
     else {
