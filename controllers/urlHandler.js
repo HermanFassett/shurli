@@ -39,15 +39,16 @@ function UrlHandler () {
           // Update current
           Current.findOneAndUpdate({}, {current:short}, function(err) {if (err) console.log(err)});
           // New url
+          var orig = head + "//" + input;
           var url = new Url({
-            original_url: input,
+            original_url: orig,
             short_id: short
           });
           // Save url
           url.save();
           // Send json result
           var shorturl = process.env.APP_URL + short;
-          res.json({original_url:input, short_url: short})
+          res.json({original_url:orig, short_url: shorturl})
         });
       }
       else {
