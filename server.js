@@ -27,7 +27,7 @@ app.get("/", function(req, res) {
 });
 
 // New short url route
-app.get("/new/:url", function(req, res) {
+app.get("/new/:url*", function(req, res) {
   var input = req.params.url;
   console.log(input);
   Url.findOne({original_url: input}, function(err, result) {
