@@ -3,25 +3,30 @@ var Current = require("../models/current.js");
 
 function UrlHandler () {
 	this.getUrl = function(req, res) {
+    // Set up parameters
     var input = req.params.url;
-    Url.findOne({original_url: input}, function(err, origres) {
+    if (req.params["0"]) input += req.params["0"];
+    var head = req.params.head || "http:";
+    var full_url = head + "//" + input;
+    // Try to find document by original url
+    Url.findOne({original_url: full_url}, function(err, origres) {
+      // If it doesn't exist, try to find by short url
       if (!origres) {
         Url.findOne({short_id: input}, function(err, shortres) {
-          if (!shortres) {
-            res.json({original_url:null, short_url:null});
-          }
-          else {
-            res.redirect(shortres.original_url);
-          }
+          // If nothing found display null for result
+          if (!shortres) res.json({original_url:null, short_url:input});
+          else res.redirect(shortres.original_url); // Otherwise redirect to url
         });
       }
+      // Else display info
       else {
         var url = process.env.APP_URL + origres.short_id;
-        res.json({original_url: input, short_url: url});
+        res.json({original_url: full_url, short_url: url});
       }
     });
 	};
   this.addUrl = function(req, res) {
+    // Set up parameters
     var input = req.params.url;
     if (req.params["0"]) input += req.params["0"];
     var head = req.params.head || "http:";
