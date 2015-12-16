@@ -32,6 +32,7 @@ app.get("/:url", function(req, res) {
             short_id: "abcd"
           });
           url.save();
+          res.json({original_url:null, short_id:null});
         }
         else {
           res.json(shortres);
@@ -42,7 +43,6 @@ app.get("/:url", function(req, res) {
       res.json(origres);
     }
   });
-  res.json({original_url:null, short_id:null});
 });
 
 // Listen on default port or 5000
