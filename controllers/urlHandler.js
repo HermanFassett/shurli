@@ -25,7 +25,8 @@ function UrlHandler () {
     var input = req.params.url;
     if (req.params["0"]) input += req.params["0"];
     var head = req.params.head || "http:";
-    Url.findOne({original_url: input}, function(err, result) {
+    var full_url = head + "//" + input;
+    Url.findOne({original_url: full_url}, function(err, result) {
       if (!result) {
         Current.findOne({}, function(err, result) {
           if (err) throw err;
@@ -40,21 +41,20 @@ function UrlHandler () {
           // Update current
           Current.findOneAndUpdate({}, {current:short}, function(err) {if (err) console.log(err)});
           // New url
-          var orig = head + "//" + input;
           var url = new Url({
-            original_url: orig,
+            original_url: full_url,
             short_id: short
           });
           // Save url
           url.save();
           // Send json result
           var shorturl = process.env.APP_URL + short;
-          res.json({original_url:orig, short_url: shorturl})
+          res.json({original_url: full_url, short_url: shorturl})
         });
       }
       else {
         var shorturl = process.env.APP_URL + result.short_id;
-        res.json({original_url:input, short_url: shorturl})
+        res.json({original_url: full_url, short_url: shorturl})
       }
     });
   }
