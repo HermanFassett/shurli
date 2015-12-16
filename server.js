@@ -20,7 +20,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", function(req, res) {
   res.send("HELLO WORLD");
-})
+});
+app.get("/:url", function(req, res) {
+  var input = req.params.url;
+  res.json({url:input});
+});
 
 // Listen on default port or 5000
 app.listen(process.env.PORT || 8080);
