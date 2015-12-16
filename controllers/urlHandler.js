@@ -22,6 +22,7 @@ function UrlHandler () {
     });
 	};
   this.addUrl = function(req, res) {
+    console.log(req.params);
     var input = req.params.url;
     var head = req.params.head || "http:";
     Url.findOne({original_url: input}, function(err, result) {
