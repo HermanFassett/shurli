@@ -21,26 +21,41 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get("/", function(req, res) {
   res.send("HELLO WORLD");
 });
+app.get("/new/:url", function(req, res) {
+  var input = req.params.url;
+  Url.findOne({original_url: input}, function(err, result) {
+    if (!result) {
+      var short = "abcd";
+      var url = new Url({
+        original_url: input,
+        short_id: short
+      });
+      url.save();
+      var shorturl = process.env.APP_URL + short;
+      res.json({original_url:input, short_url: short})
+    }
+    else {
+      var shorturl = process.env.APP_URL + result.short_id;
+      res.json({original_url:input, short_url: shorturl})
+    }
+  })
+});
 app.get("/:url", function(req, res) {
   var input = req.params.url;
   Url.findOne({original_url: input}, function(err, origres) {
     if (!origres) {
       Url.findOne({short_id: input}, function(err, shortres) {
         if (!shortres) {
-          var url = new Url({
-            original_url: input,
-            short_id: "abcd"
-          });
-          url.save();
-          res.json({original_url:null, short_id:null});
+          res.json({original_url:null, short_url:null});
         }
         else {
-          res.json(shortres);
+          res.redirect(shortres.original_url);
         }
       });
     }
     else {
-      res.json(origres);
+      var url = process.env.APP_URL + origres.short_id;
+      res.json({original_url: input, short_url: url});
     }
   });
 });
