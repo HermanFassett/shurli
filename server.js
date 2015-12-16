@@ -23,12 +23,26 @@ app.get("/", function(req, res) {
 });
 app.get("/:url", function(req, res) {
   var input = req.params.url;
-  var url = new Url({
-    original_url: "www.google.com",
-    short_id: "abcd"
+  Url.findOne({original_url: input}, function(err, origres) {
+    if (!origres) {
+      Url.findOne({short_id: input}, function(err, shortres) {
+        if (!shortres) {
+          var url = new Url({
+            original_url: input,
+            short_id: "abcd"
+          });
+          url.save();
+        }
+        else {
+          res.json(shortres);
+        }
+      });
+    }
+    else {
+      res.json(origres);
+    }
   });
-  url.save();
-  res.json({url:input});
+  res.json({original_url:null, short_id:null});
 });
 
 // Listen on default port or 5000
