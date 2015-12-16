@@ -28,19 +28,28 @@ app.get("/", function(req, res) {
 
 // New short url route
 app.get("/new/:url", function(req, res) {
-  var input = encodeURIComponent(req.params.url);
+  var input = req.params.url;
   console.log(input);
   Url.findOne({original_url: input}, function(err, result) {
     if (!result) {
       Current.findOne({}, function(err, result) {
         if (err) throw err;
-        console.log(result);
+        // Update short id
         var short = result.current;
+        var options = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        // Find current index
+        var index = options.indexOf(short.charAt(0));
+        // Update short id
+        if (index === options.length - 1) short = "0" + short;
+        else short = options.charAt(++index) + short.substr(1);
+        // New url
         var url = new Url({
           original_url: input,
           short_id: short
         });
+        // Save url
         url.save();
+        // Send json result
         var shorturl = process.env.APP_URL + short;
         res.json({original_url:input, short_url: short})
       });
