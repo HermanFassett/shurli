@@ -4,9 +4,12 @@ var mongoose = require("mongoose");
 var path = require("path");
 var session = require('express-session');
 var bodyParser = require('body-parser');
+// Require mongoos models
 var Url = require(path.dirname() + "/models/urls.js");
-
+var Current = require(path.dirname() + "/models/current.js");
+// Init app
 var app = express();
+// Get db uri
 var uristring = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || process.env.MONGO_URI;
 
 // Connect to db
@@ -18,21 +21,37 @@ mongoose.connect(uristring, function (err, res) {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Default route
 app.get("/", function(req, res) {
   res.send("HELLO WORLD");
 });
+
+// New short url route
 app.get("/new/:url", function(req, res) {
   var input = req.params.url;
   Url.findOne({original_url: input}, function(err, result) {
     if (!result) {
-      var short = "abcd";
-      var url = new Url({
-        original_url: input,
-        short_id: short
+      Current.findOne({}, function(err, result) {
+        if (err) throw err;
+        if (!result) {
+          var curr = new Current({
+            current: "0"
+          });
+          curr.save();
+          res.send("Saved");
+        }
+        else {
+          console.log(result);
+          var short = result.current;
+          var url = new Url({
+            original_url: input,
+            short_id: short
+          });
+          url.save();
+          var shorturl = process.env.APP_URL + short;
+          res.json({original_url:input, short_url: short})
+        }
       });
-      url.save();
-      var shorturl = process.env.APP_URL + short;
-      res.json({original_url:input, short_url: short})
     }
     else {
       var shorturl = process.env.APP_URL + result.short_id;
