@@ -23,7 +23,7 @@ function UrlHandler () {
 	};
   this.addUrl = function(req, res) {
     var input = req.params.url;
-    console.log(input);
+    var head = req.params.head || "http:";
     Url.findOne({original_url: input}, function(err, result) {
       if (!result) {
         Current.findOne({}, function(err, result) {
@@ -36,6 +36,8 @@ function UrlHandler () {
           // Update short id
           if (index === options.length - 1) short = "0" + short;
           else short = options.charAt(++index) + short.substr(1);
+          // Update current
+          Current.findOneAndUpdate({}, {current:short}, function(err) {if (err) console.log(err)});
           // New url
           var url = new Url({
             original_url: input,
