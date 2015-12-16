@@ -4,7 +4,7 @@ var mongoose = require("mongoose");
 var path = require("path");
 var session = require('express-session');
 var bodyParser = require('body-parser');
-//var Url = require(path.dirname() + "/models/urls.js");
+var Url = require(path.dirname() + "/models/urls.js");
 
 var app = express();
 var uristring = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || process.env.MONGO_URI;
