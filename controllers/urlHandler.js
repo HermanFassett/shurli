@@ -21,7 +21,7 @@ function UrlHandler () {
       if (!origres) {
         Url.findOne({short_id: input}, function(err, shortres) {
           // If nothing found display null for result
-          if (!shortres) res.json({original_url:null, short_url:input});
+          if (!shortres) res.json({error: "No short url found for given input"});
           else res.redirect(shortres.original_url); // Otherwise redirect to url
         });
       }
@@ -35,6 +35,11 @@ function UrlHandler () {
   this.addUrl = function(req, res) {
     // Set up parameters
     var input = req.params.url;
+		// Make sure it's at least not a short id
+		if (input.indexOf(".") === -1) {
+			res.json({error: "No valid url given"});
+			res.end();
+		}
 		// Get all parameters
     if (req.params["0"]) input += (req.params["0"].charAt(0) == "/" ? "" : "/") + req.params["0"];
 		// Get all queries
@@ -45,7 +50,6 @@ function UrlHandler () {
 		}
     var head = req.params.head || "http:";
     var full_url = head + "//" + input;
-		console.log(full_url);
     Url.findOne({original_url: full_url}, function(err, result) {
       if (!result) {
         Current.findOne({}, function(err, result) {
