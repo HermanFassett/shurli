@@ -29,9 +29,13 @@ app.get("/", function(req, res) {
 
 // New short url route
 app.get("/new/:head//:url*", urlHandler.addUrl);
+app.get("/new/:head//:url/*/", urlHandler.getUrl);
+app.get("/new/:url/*/", urlHandler.addUrl);
 app.get("/new/:url*", urlHandler.addUrl);
 // Get url route
 app.get("/:head//:url*", urlHandler.getUrl);
+app.get("/:head//:url/*/", urlHandler.getUrl);
+app.get("/:url/*/", urlHandler.getUrl);
 app.get("/:url*", urlHandler.getUrl);
 
 // Listen on default port or 5000
