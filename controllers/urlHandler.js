@@ -6,9 +6,8 @@ function UrlHandler () {
 		console.log(req.url);
     // Set up parameters
     var full_url = input = req.url.slice(1);
-		if (!input.substr(0,8).match(/http(s?):\/\//)) input = "http://" + input;
+		if (!input.substr(0,8).match(/http(s?):\/\//)) full_url = "http://" + input;
     // Try to find document by original url
-		console.log(full_url);
     Url.findOne({original_url: full_url}, function(err, origres) {
       // If it doesn't exist, try to find by short url
       if (!origres) {
