@@ -27,6 +27,7 @@ function UrlHandler () {
   this.addUrl = function(req, res) {
 		// Set up url
     var full_url = input = req.url.slice(5);
+		if (input.indexOf(".") === -1) return res.json({error: "No valid url given"});
 		if (!input.substr(0,8).match(/http(s?):\/\//)) full_url = "http://" + input;
     Url.findOne({original_url: full_url}, function(err, result) {
       if (!result) {
