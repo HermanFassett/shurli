@@ -40,11 +40,12 @@ function UrlHandler () {
 		// Get all queries
 		var i = 0;
 		for (var key in req.query) {
-			input += (key === 0) ? "?" : "&" + key + "=" + req.query[key];
+			input += ((i === 0) ? "?" : "&") + key + "=" + req.query[key];
 			i++
 		}
     var head = req.params.head || "http:";
     var full_url = head + "//" + input;
+		console.log(full_url);
     Url.findOne({original_url: full_url}, function(err, result) {
       if (!result) {
         Current.findOne({}, function(err, result) {
