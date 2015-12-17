@@ -5,9 +5,10 @@ function UrlHandler () {
 	this.getUrl = function(req, res) {
     // Set up parameters
     var input = req.params.url;
-		console.log(req.params);
-		console.log(req.query);
+		// Get all parameters
     if (req.params["0"]) input += req.params["0"];
+		// Get all queries
+		for (var i in req.query) input += "?" + i + "=" + req.query[i];
     var head = req.params.head || "http:";
     var full_url = head + "//" + input;
     // Try to find document by original url
@@ -30,7 +31,10 @@ function UrlHandler () {
   this.addUrl = function(req, res) {
     // Set up parameters
     var input = req.params.url;
+		// Get all parameters
     if (req.params["0"]) input += req.params["0"];
+		// Get all queries
+		for (var i in req.query) input += "?" + i + "=" + req.query[i];
     var head = req.params.head || "http:";
     var full_url = head + "//" + input;
     Url.findOne({original_url: full_url}, function(err, result) {
