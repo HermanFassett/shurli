@@ -37,7 +37,7 @@ function UrlHandler () {
     var input = req.params.url;
 		// Make sure it's at least not a short id
 		if (input.indexOf(".") === -1) {
-			res.json({error: "No valid url given"});
+			//res.json({error: "No valid url given"});
 			res.end();
 		}
 		// Get all parameters
