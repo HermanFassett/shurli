@@ -3,19 +3,12 @@ var Current = require("../models/current.js");
 
 function UrlHandler () {
 	this.getUrl = function(req, res) {
+		console.log(req.url);
     // Set up parameters
-    var input = req.params.url;
-		// Get all parameters
-    if (req.params["0"]) input += (req.params["0"].charAt(0) == "/" ? "" : "/") + req.params["0"];
-		// Get all queries
-		var i = 0;
-		for (var key in req.query) {
-			input += ((i === 0) ? "?" : "&") + key + "=" + req.query[key];
-			i++
-		}
-    var head = req.params.head || "http:";
-    var full_url = head + "//" + input;
+    var full_url = input = req.url.slice(1);
+		if (!input.substr(0,8).match(/http(s?):\/\//)) input = "http://" + input;
     // Try to find document by original url
+		console.log(full_url);
     Url.findOne({original_url: full_url}, function(err, origres) {
       // If it doesn't exist, try to find by short url
       if (!origres) {
