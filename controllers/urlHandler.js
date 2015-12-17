@@ -5,6 +5,8 @@ function UrlHandler () {
 	this.getUrl = function(req, res) {
     // Set up parameters
     var input = req.params.url;
+		console.log(req.params);
+		console.log(rew.query);
     if (req.params["0"]) input += req.params["0"];
     var head = req.params.head || "http:";
     var full_url = head + "//" + input;
