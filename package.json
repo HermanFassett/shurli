@@ -4,6 +4,10 @@
   "description": "A URL shortener API",
   "main": "server.js",
   "homepage": "https://shurli.herokuapp.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HermanFassett/shurli.git"
+  },
   "keywords": [
     "MongoDB",
     "Mongoose",
