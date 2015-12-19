@@ -1,6 +1,7 @@
 // Require models
 var Url = require("../models/urls.js");
 var Current = require("../models/current.js");
+var http = require('http');
 
 function UrlHandler () {
 	this.getUrl = function(req, res) {
@@ -27,9 +28,21 @@ function UrlHandler () {
   this.addUrl = function(req, res) {
 		// Set up url
     var full_url = input = req.url.slice(5);
-		if (input.indexOf(".") === -1) return res.json({error: "No valid url given"});
+		// Check if url exists
+		// First basic check
+		if (input.indexOf(".") === -1) return res.json({error: "URL invalid"});
+		// Second more advanced check;
+		var options = {method: 'HEAD', host: input, port: 80, path: '/'},
+    req = http.request(options, function(r) { });
+		req.on('error', function (e) {
+		  return res.json({error: "URL not found"}); // Most likely ENOTFOUND in this case
+		});
+		req.end();
+		// Add http if it doesn't exist
 		if (!input.substr(0,8).match(/http(s?):\/\//)) full_url = "http://" + input;
+		// Try to find url in existing urls
     Url.findOne({original_url: full_url}, function(err, result) {
+			// If it doesn't exist, add it
       if (!result) {
         Current.findOne({}, function(err, result) {
           if (err) throw err;
@@ -55,6 +68,7 @@ function UrlHandler () {
           res.json({original_url: full_url, short_url: shorturl})
         });
       }
+			// If url is in database, show info
       else {
         var shorturl = process.env.APP_URL + result.short_id;
         res.json({original_url: full_url, short_url: shorturl})
