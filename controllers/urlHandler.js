@@ -34,11 +34,12 @@ function UrlHandler () {
 		// First basic check
 		if (input.indexOf(".") === -1) return res.json({error: "URL invalid"});
 		// Second more advanced check;
-		var test_url = full_url.split("//")[1]; // Get url without http://
+		var test_url = full_url.split(/[(\/\/)(/)]/); // Get url without http://
+		test_url = test_url[2];
     var options = {method: 'HEAD', host: test_url, port: 80, path: '/'},
     reqCheck = http.request(options, function(){});
 		reqCheck.on('error', function (e) {
-		  return res.json({error: "URL not found"});
+		  return res.json({error: e});//"URL not found"}); // Most likely it isn't found
 		});
 		reqCheck.end(function() {
 			// Only once reqCheck is done so no double headers
