@@ -1,7 +1,7 @@
 // Require models
 var Url = require("../models/urls.js");
 var Current = require("../models/current.js");
-var request = require('request');
+var http = require('http');
 
 function UrlHandler () {
 	this.getUrl = function(req, res) {
@@ -30,47 +30,53 @@ function UrlHandler () {
     var full_url = input = req.url.slice(5);
 		// Add http if it doesn't exist
 		if (!input.substr(0,8).match(/http(s?):\/\//)) full_url = "http://" + input;
-		// Check if url exists
+		// ~~Checking if url exists~~ //
 		// First basic check
 		if (input.indexOf(".") === -1) return res.json({error: "URL invalid"});
 		// Second more advanced check;
-		request(full_url, function (error, response) {
-			if (error) return res.json({error: "URL not found"});
-		})
-		// Try to find url in existing urls
-    Url.findOne({original_url: full_url}, function(err, result) {
-			// If it doesn't exist, add it
-      if (!result) {
-        Current.findOne({}, function(err, result) {
-          if (err) throw err;
-          // Update short id
-          var short = result.current;
-          var options = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-          // Find current index
-          var index = options.indexOf(short.charAt(0));
-          // Update short id
-          if (index === options.length - 1) short = "0" + short;
-          else short = options.charAt(++index) + short.substr(1);
-          // Update current
-          Current.findOneAndUpdate({}, {current:short}, function(err) {if (err) console.log(err)});
-          // New url
-          var url = new Url({
-            original_url: full_url,
-            short_id: short
-          });
-          // Save url
-          url.save();
-          // Send json result
-          var shorturl = process.env.APP_URL + short;
-          res.json({original_url: full_url, short_url: shorturl})
-        });
-      }
-			// If url is in database, show info
-      else {
-        var shorturl = process.env.APP_URL + result.short_id;
-        res.json({original_url: full_url, short_url: shorturl})
-      }
-    });
+		var test_url = full_url.split("//")[1]; // Get url without http://
+    var options = {method: 'HEAD', host: test_url, port: 80, path: '/'},
+    reqCheck = http.request(options, function(){});
+		reqCheck.on('error', function (e) {
+		  return res.json({error: "URL not found"});
+		});
+		reqCheck.end(function() {
+			// Only once reqCheck is done so no double headers
+			// Try to find url in existing urls
+			Url.findOne({original_url: full_url}, function(err, result) {
+				// If it doesn't exist, add it
+				if (!result) {
+					Current.findOne({}, function(err, result) {
+						if (err) throw err;
+						// Update short id
+						var short = result.current;
+						var options = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+						// Find current index
+						var index = options.indexOf(short.charAt(0));
+						// Update short id
+						if (index === options.length - 1) short = "0" + short;
+						else short = options.charAt(++index) + short.substr(1);
+						// Update current
+						Current.findOneAndUpdate({}, {current:short}, function(err) {if (err) console.log(err)});
+						// New url
+						var url = new Url({
+							original_url: full_url,
+							short_id: short
+						});
+						// Save url
+						url.save();
+						// Send json result
+						var shorturl = process.env.APP_URL + short;
+						res.json({original_url: full_url, short_url: shorturl})
+					});
+				}
+				// If url is in database, show info
+				else {
+					var shorturl = process.env.APP_URL + result.short_id;
+					res.json({original_url: full_url, short_url: shorturl})
+				}
+			});
+		});
   }
 }
 module.exports = UrlHandler;
