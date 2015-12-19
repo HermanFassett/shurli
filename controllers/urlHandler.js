@@ -33,11 +33,11 @@ function UrlHandler () {
 		if (input.indexOf(".") === -1) return res.json({error: "URL invalid"});
 		// Second more advanced check;
 		var options = {method: 'HEAD', host: input, port: 80, path: '/'},
-    req = http.request(options, function(r) { });
-		req.on('error', function (e) {
+    request = http.request(options, function(r) { });
+		request.on('error', function (e) {
 		  return res.json({error: "URL not found"}); // Most likely ENOTFOUND in this case
 		});
-		req.end();
+		request.end();
 		// Add http if it doesn't exist
 		if (!input.substr(0,8).match(/http(s?):\/\//)) full_url = "http://" + input;
 		// Try to find url in existing urls
