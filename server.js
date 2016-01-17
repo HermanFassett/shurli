@@ -11,7 +11,7 @@ var urlHandler = new UrlHandler();
 // Init app
 var app = express();
 // Get db uri
-var uristring = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || process.env.MONGO_URI || "mongodb://heroku_b9rr8wqk:l8n0rmlhrvm7lpupg72c3l3k3g@ds033135.mongolab.com:33135/heroku_b9rr8wqk";
+var uristring = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || process.env.MONGO_URI;
 
 // Connect to db
 mongoose.connect(uristring, function (err, res) {
