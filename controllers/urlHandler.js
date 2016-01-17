@@ -26,22 +26,27 @@ function UrlHandler () {
     });
 	};
   this.addUrl = function(req, res) {
+		var allow = (req.query.allow === "true") || false;
 		// Set up url
-    var full_url = input = req.url.slice(5);
-		// Add http if it doesn't exist
-		if (!input.substr(0,8).match(/http(s?):\/\//)) full_url = "http://" + input;
-		// ~~Checking if url exists~~ //
-		// First basic check
-		if (input.indexOf(".") === -1) return res.json({error: "URL invalid"});
-		// Second more advanced check;
-		var test_url = full_url.split(/[(\/\/)(/)]/); // Get url without http://
-		test_url = test_url[2];
-    var options = {method: 'HEAD', host: test_url, port: 80, path: '/'},
-    reqCheck = http.request(options, function(){});
-		reqCheck.on('error', function (e) {
-		  return res.json({error: e});//"URL not found"}); // Most likely it isn't found
-		});
-		reqCheck.end(function() {
+		var full_url = input = req.url.slice(5).replace("?allow=true", "");
+		if (!allow) {
+			// Add http if it doesn't exist
+			if (!input.substr(0,8).match(/http(s?):\/\//)) full_url = "http://" + input;
+			// ~~Checking if url exists~~ //
+			// First basic check
+			if (input.indexOf(".") === -1) return res.json({error: "URL invalid"});
+			// Second more advanced check;
+			var test_url = full_url.split(/[(\/\/)(/)]/); // Get url without http://
+			test_url = test_url[2];
+	    var options = {method: 'HEAD', host: test_url, port: 80, path: '/'},
+	    reqCheck = http.request(options, function(){});
+			reqCheck.on('error', function (e) {
+			  return res.json({error: e}); //"URL not found"}); // Most likely it isn't found
+			});
+			reqCheck.end(check);
+		}
+		else {check()}
+		function check() {
 			// Only once reqCheck is done so no double headers
 			// Try to find url in existing urls
 			Url.findOne({original_url: full_url}, function(err, result) {
@@ -77,7 +82,7 @@ function UrlHandler () {
 					res.json({original_url: full_url, short_url: shorturl})
 				}
 			});
-		});
+		}
   }
 }
 module.exports = UrlHandler;
